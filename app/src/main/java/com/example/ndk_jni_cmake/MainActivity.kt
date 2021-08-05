@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * A native method that is implemented by the 'ndk_jni_cmake' native library,
+     * A native method that is implemented by the 'jni_cmake_lib' native library,
      * which is packaged with this application.
      */
     external fun stringFromJNI(): String
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         // Used to load the 'ndk_jni_cmake' library on application startup.
         init {
-            System.loadLibrary("ndk_jni_cmake")
+            System.loadLibrary("jni_cmake_lib")
         }
     }
 }
