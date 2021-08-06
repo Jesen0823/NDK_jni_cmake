@@ -284,7 +284,7 @@ file(TO_CMAKE_PATH path result)
 #NOTE:按照官方文档的说法,不建议使用file的GLOB指令来收集工程的源文件
 file(GLOB variable [RELATIVE path] [globbing expressions]…)
    ```
-#####set_directory_properties命令 
+##### set_directory_properties命令 
   **set_directory_properties(PROPERTIES prop1 value1 prop2 value2)**
  >设置路径的一种,参数propl, prop2代表属性,取值为:
 INCLUDE_DIRECTORIES 包含目录
@@ -292,7 +292,7 @@ LINK_DIRECTORIES  连接目录
 INCLUDE_REGULAR_EXPERSSION 正则表达式
 ADDITIONAL_MAKE_CLEAN_FILES 额外清理文件
 
-#####set_property命令
+##### set_property命令
    ```cmake
    set_property(<GLOBAL
 DIRECTORY [dir] |
@@ -311,8 +311,8 @@ SOURCE：源文件作用域，可以是0个或多个源文件
 TEST：测试作用域，可以是0个或多个已有的测试
 CACHE：必须指定0个或多个cache中已有的条目
    
-#####多个源文件处理
-   如果源文件很多，把所有文件一个个加入很麻烦，可以使用
+##### 多个源文件处理
+      如果源文件很多，把所有文件一个个加入很麻烦，可以使用
 aux_source_directory命令或file命令，会查找指定目录下的所有源文
 件，然后将结果存进指定变量名。
 ```cmake
@@ -329,7 +329,7 @@ native-lib
 SHARED
 ${DIR_SRCS})
 ```
-#####多目录多源文件处理
+##### 多目录多源文件处理
 * 主目录中的CMakeLists.txt中添加add_subdirectory(child）命令，指明本项目包含一个子项目child。并在target_link_libraries
 指明本项目需要链接一个名为child的库.
 * 子目录child中创建CMakeLists.txt， 这里child编译为共享库。
@@ -352,40 +352,78 @@ child
 SHARED
 ${DIR_LIB_SRCS})
 ```
- 
+##### 添加预编译库
+* 6.0版本之前：
+   * 假设我们本地项目引用了libimported-lib.so。
+   * 添加add_library命令，第一个参数是模块名，第二个参数SHARED表示动态库，STATIC表示静态库，第三个参数IMPORTED表示以导入的形式添加。
+   * 添加set_target_properties命令设置导入路径属性。
+   * 将import-lib添加到target_link_libraries命令参数中，表示native-lib需要链接imported-lib模块
+   ```cmake
+   cmake_minimum_required(VERSION 3.4.1)
+#使用 IMPORTED 标志告知 CMake 只希望将库导入到项目中# 如果是静态库则将shared改为static
+add_library( imported-lib
+        SHARED
+        IMPORTED )
+#参数分别为：库、属性、导入地址、库所在地址
+set_target_properties(
+        imported-libPROPERTIES
+        IMPORTED__LOCATION
+        <路径>/libimported-lib.so)
+aux_source_directory(. DIR_SRCS)
+add_library(
+        native-lib
+        SHARED
+        ${DIR_SRCS})
+target_link_libraries(native-lib imported-lib)
+   ```
+   * 6.0版本之后：
+      * Android 6.0以上用上面方法添加预编译动态库会有问题，这里可以使用另外一种方式
+      ```cmake
+      # set命令定义一个变量
+# CMAKE_C_FLAGS：c的参数，会传递给编译器
+# 如果是c++文件，需要用CMAKE_CXX_FLAGS
+#-L：库的查找路径
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L[SO所在目录]")
+      ```
+##### 添加头文件目录
+      ·为了确保CMake可以在编译时定位头文件，使用include_directories, 
+      相当于g++选项中的-1参数。这样就可以使用`#include<xx.h>`，否则需要使用`#include "path/xx.h"`
+      ```cmake
+        cmake_minimum_required(VERSION 3.4.1)
+#设置头文件目录
+include_directories(<文件目录>)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L[SO所在目录]")
+aux_source_directory(.DIR_SRCS)
+add_library(
+        native-lib
+        SHARED
+        ${DIR_SRCS})
+target_link_libraries(native-lib imported-lib)
+      ```
+           
 ### build.gradle配置
  ```groovy
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
-
+    // ...
     defaultConfig {
-        applicationId "com.xxx.code.cmake_jni"
-        minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
-        
+        // ...
         externalNativeBuild {
             cmake {
-                // 使用的编译器clang/gcc        
-                arguments "-DANDROID_TOOLCHAIN=clang", 
-                // cmake默认是gnustl_static        
-                "-DANDROID_STL=gnustl_static"
-                // 指定cflags和cppflags,效果和cmakelist一样
-                cppFlags ""
+                 //使用的编译器clang/gcc
+                 //cmake默认是 gnustl_static
+                arguments "-DANDROID_TOOLCHAIN=clang", "-DANDROID_STL=gnustl_static"
+                //指定cflags和cppflags,效果和cmakelist使用一样
                 cFlags ""
-                // 指定cpu架构
-                abiFilters "armeabi-v7a"
+                cppFlags ""
+                //指定需要编译的cpu架构
+                abiFilters "armeabi-v7a”
             }
         }
     }
-    buildTypes {/*...*/}
     externalNativeBuild {
         cmake {
-            // 指定CMakeLists.txt文件相对当前build.gradle的路径
-            path "src/main/cpp/CMakeLists.txt"
-            version "3.10.2"
+            //指定CMakeLists.txt文件相对当前Build.gradle的路径
+            path "xxx/CMakeLists.txt"
         }
     }
 }
