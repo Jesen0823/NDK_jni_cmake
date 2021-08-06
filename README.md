@@ -221,88 +221,91 @@ target_link_libraries( # Specifies the target library.
 ```
 ##### set常用命令：
 ```cmake
-# 设置可执行文件的输出路径，全局变量
-set(EXECUTABLE_OUTPUT_PATH [output_path])
-# 设置库文件的输出路径，全局变量
-set(LIBRARY_OUTPUT_PATH [output path])
-# 设置C++编译参数，全局变量
-set(CMAKE_CXX_FLAGS "-Wall std=c++11")
-# 设置源文件集合，本地自定义变量
-set(SOURCE_FILES main.cpp test,cpp...)
+   # 设置可执行文件的输出路径，全局变量
+   set(EXECUTABLE_OUTPUT_PATH [output_path])
+   # 设置库文件的输出路径，全局变量
+   set(LIBRARY_OUTPUT_PATH [output path])
+   # 设置C++编译参数，全局变量
+   set(CMAKE_CXX_FLAGS "-Wall std=c++11")
+   # 设置源文件集合，本地自定义变量
+   set(SOURCE_FILES main.cpp test,cpp...)
 ```
 ##### -include_directories
-设置头文件目录，相对于g++中-I参数，可以使用相对路径，绝对路径，或者自定义变量
+   
+   设置头文件目录，相对于g++中-I参数，可以使用相对路径，绝对路径，或者自定义变量
 ```cmake
-include_directories(./include ${MY_INCLUDE})
+   include_directories(./include ${MY_INCLUDE})
 ```
 ##### add_executable(<name> ${SRC_LIST})
-添加可执行文件
+   添加可执行文件
 
 ##### add_subdirecroty(sub_dir [binary_dir])
-若当前目录下还有子目录，且子目录也包含了一个CMakeList.txt
-sub_dir 包含CmakeLists.txt和源码文件的子目录路径
-binary_dir 输出路径，可选参数，一般不用指定
+   
+   若当前目录下还有子目录，且子目录也包含了一个CMakeList.txt
+   sub_dir 包含CmakeLists.txt和源码文件的子目录路径
+   binary_dir 输出路径，可选参数，一般不用指定
 
 ##### 常用命令 -file
 文件操作命令：
-   ```cmake
+  ```cmake
    #将message写入filename文件中,会覆盖文件原有内容
-file(WRITE filename "message")
+   file(WRITE filename "message")
 
-#将message写入filename文件中,会追加在文件末尾
-file(APPEND filename "message")
+   #将message写入filename文件中,会追加在文件末尾
+   file(APPEND filename "message")
 
-#从filename文件中读取内容并存储到var变量中,如果指定了numBytes和offset
-#则从offset处开始最多读numBytes个字节,另外如果指定了HEX参数,则内容会以十六进制形式存储在var变量中
-file (READ filename var [LIMIT numBytes] [OFFSET offset] [HEX])
+   #从filename文件中读取内容并存储到var变量中,如果指定了numBytes和offset
+   #则从offset处开始最多读numBytes个字节,另外如果指定了HEX参数,则内容会以十六进制形式存储在var变量中
+   file (READ filename var [LIMIT numBytes] [OFFSET offset] [HEX])
 
-#重命名文件
-file(RENAME <oldname> <newname>)
+   #重命名文件
+   file(RENAME <oldname> <newname>)
 
-#删除文件, 等于rm命令
-file (REMOVE [file1...])
+   #删除文件, 等于rm命令
+   file (REMOVE [file1...])
 
-#递归的执行删除文件命令,等于rm-r
-file (REMOVE RECURSE [file1…])
+   #递归的执行删除文件命令,等于rm-r
+   file (REMOVE RECURSE [file1…])
 
-#根据指定的url下载文件
-#timeout超时时间;下载的状态会保存到status中;下载日志会被保存到log; sum指定所下载文件预期的MD5值,如果指定会自动进行比对
-#如果不一致,则回一个错误: SHOW PROGRESS,进度信息会以状态信息的形式被打印出来
-file(DOWNLOAD url file[TIMEOUT timout][STATUS status][LOG log][EXPECTED_MD5 sum][SHOW_PROGRESS])
+   #根据指定的url下载文件
+   #timeout超时时间;下载的状态会保存到status中;下载日志会被保存到log; sum指定所下载文件预期的MD5值,如果指定会自动进行比对
+   #如果不一致,则回一个错误: SHOW PROGRESS,进度信息会以状态信息的形式被打印出来
+   file(DOWNLOAD url file[TIMEOUT timout][STATUS status][LOG log][EXPECTED_MD5 sum][SHOW_PROGRESS])
 
-#创建目录
-file(MAKE DIRECTORY [dirl dir2…])
+   #创建目录
+   file(MAKE DIRECTORY [dirl dir2…])
 
-# 会把path转换为以unix的/开头的cmake风格路径,保存在result中
-file(CMAKE_PATH path result)
+   #会把path转换为以unix的/开头的cmake风格路径,保存在result中
+   file(CMAKE_PATH path result)
 
-#它会把cmake风格的路径转换为本地路径风格: windows下用"\",而unix下用"/"
-file(TO_CMAKE_PATH path result)
+   #它会把cmake风格的路径转换为本地路径风格: windows下用"\",而unix下用"/"
+   file(TO_CMAKE_PATH path result)
 
-#将会为所有匹配查询表达式的文件生成一个文件list,并将该list存储进交量variable里,如果一个表达式指定了RELATIVE,返回的结果
-#将会是相对于给定路径的相对路径,查询表达式例子: *.cxx, *.vt?
-#NOTE:按照官方文档的说法,不建议使用file的GLOB指令来收集工程的源文件
-file(GLOB variable [RELATIVE path] [globbing expressions]…)
-   ```
+   #将会为所有匹配查询表达式的文件生成一个文件list,并将该list存储进交量variable里,如果一个表达式指定了RELATIVE,返回的结果
+   #将会是相对于给定路径的相对路径,查询表达式例子: *.cxx, *.vt?
+   #NOTE:按照官方文档的说法,不建议使用file的GLOB指令来收集工程的源文件
+   file(GLOB variable [RELATIVE path] [globbing expressions]…)
+ ```
 ##### set_directory_properties命令 
   **set_directory_properties(PROPERTIES prop1 value1 prop2 value2)**
- >设置路径的一种,参数propl, prop2代表属性,取值为:
-INCLUDE_DIRECTORIES 包含目录
-LINK_DIRECTORIES  连接目录
-INCLUDE_REGULAR_EXPERSSION 正则表达式
-ADDITIONAL_MAKE_CLEAN_FILES 额外清理文件
+   >设置路径的一种,参数propl, prop2代表属性,取值为:
+   INCLUDE_DIRECTORIES 包含目录
+   LINK_DIRECTORIES  连接目录
+   INCLUDE_REGULAR_EXPERSSION 正则表达式
+   ADDITIONAL_MAKE_CLEAN_FILES 额外清理文件
 
 ##### set_property命令
    ```cmake
-   set_property(<GLOBAL
-DIRECTORY [dir] |
-TARGET [target ...] I
-SOURCE [src1...] |
-TEST [testl ...]|
-CACHE [entry1 ...]>
-[APPEND]
-PROPERTY <name> [value ...])
-   ```
+      set_property(<GLOBAL
+      DIRECTORY [dir] |
+      TARGET [target ...] I
+      SOURCE [src1...] |
+      TEST [testl ...]|
+      CACHE [entry1 ...]>
+      [APPEND]
+      PROPERTY <name> [value ...])
+   
+  ```
    > 在给定的作用域内设置一个命名的属性
 第一个参数决定了属性可以影响的作用域：
 DIRECTORY：默认当前路径，也可以用[dir]指定路径
@@ -312,22 +315,22 @@ TEST：测试作用域，可以是0个或多个已有的测试
 CACHE：必须指定0个或多个cache中已有的条目
    
 ##### 多个源文件处理
-      如果源文件很多，把所有文件一个个加入很麻烦，可以使用
-aux_source_directory命令或file命令，会查找指定目录下的所有源文
+      如果源文件很多，把所有文件一个个加入很麻烦，可以使用aux_source_directory命令或file命令，会查找指定目录下的所有源文
 件，然后将结果存进指定变量名。
+   
 ```cmake
-cmake_minimum_required(VERSION 3.4.1)
-# 查找当前目录所有源文件 并将名称保存到 DIR_SRCS
-变量
-#不能查找子目录
-aux_source_directory(. DIR_SRCS)
-#也可以使用
-# file(GLOB DIR_SRCS *.c  *.cpp)
-
-add_library(
-native-lib
-SHARED
-${DIR_SRCS})
+   cmake_minimum_required(VERSION 3.4.1)
+   # 查找当前目录所有源文件 并将名称保存到 DIR_SRCS变量
+   #不能查找子目录
+   aux_source_directory(. DIR_SRCS)
+   
+   #也可以使用
+   # file(GLOB DIR_SRCS *.c  *.cpp)
+      
+   add_library(
+      native-lib
+      SHARED
+      ${DIR_SRCS})
 ```
 ##### 多目录多源文件处理
 * 主目录中的CMakeLists.txt中添加add_subdirectory(child）命令，指明本项目包含一个子项目child。并在target_link_libraries
@@ -335,22 +338,24 @@ ${DIR_SRCS})
 * 子目录child中创建CMakeLists.txt， 这里child编译为共享库。
 ```cmake
    cmake_minimum_required(VERSION 3.4.1)
-aux_source_directory(. DIR_SRCS)
-#添加 child 子目录下的cmakelist
-add_subdirectory(child)
+   aux_source_directory(. DIR_SRCS)
+   #添加 child 子目录下的cmakelist
+   add_subdirectory(child)
 
-add_library(
-native-lib
-SHARED
-${DIR_SRCS})
-target_link_libraries(native-lib child)
-############################
-#child目录下的CMakeLists.txt：
-cmake_minimum_required(VERSION 3.4.1)
-aux_source_directory(. DIR_LIB_SRCS)add_library(
-child
-SHARED
-${DIR_LIB_SRCS})
+   add_library(
+      native-lib
+      SHARED
+      ${DIR_SRCS})
+   target_link_libraries(native-lib child)
+   ############################
+   
+   #child目录下的CMakeLists.txt：
+   cmake_minimum_required(VERSION 3.4.1)
+   aux_source_directory(. DIR_LIB_SRCS)add_library(
+         child
+         SHARED
+   ${DIR_LIB_SRCS})
+   
 ```
 ##### 添加预编译库
 * 6.0版本之前：
@@ -358,51 +363,60 @@ ${DIR_LIB_SRCS})
    * 添加add_library命令，第一个参数是模块名，第二个参数SHARED表示动态库，STATIC表示静态库，第三个参数IMPORTED表示以导入的形式添加。
    * 添加set_target_properties命令设置导入路径属性。
    * 将import-lib添加到target_link_libraries命令参数中，表示native-lib需要链接imported-lib模块
+   
    ```cmake
-   cmake_minimum_required(VERSION 3.4.1)
-#使用 IMPORTED 标志告知 CMake 只希望将库导入到项目中# 如果是静态库则将shared改为static
-add_library( imported-lib
+     cmake_minimum_required(VERSION 3.4.1)
+     #使用 IMPORTED 标志告知 CMake 只希望将库导入到项目中,如果是静态库则将shared改为static
+     add_library( imported-lib
         SHARED
-        IMPORTED )
-#参数分别为：库、属性、导入地址、库所在地址
-set_target_properties(
-        imported-libPROPERTIES
+        IMPORTED)
+     #参数分别为：库、属性、导入地址、库所在地址
+     set_target_properties(
+        imported-lib
+        PROPERTIES
         IMPORTED__LOCATION
         <路径>/libimported-lib.so)
-aux_source_directory(. DIR_SRCS)
-add_library(
-        native-lib
-        SHARED
-        ${DIR_SRCS})
-target_link_libraries(native-lib imported-lib)
+        aux_source_directory(. DIR_SRCS)
+        add_library(
+           native-lib
+           SHARED
+           ${DIR_SRCS})
+       target_link_libraries(native-lib imported-lib)
    ```
+           
    * 6.0版本之后：
       * Android 6.0以上用上面方法添加预编译动态库会有问题，这里可以使用另外一种方式
+           
       ```cmake
-      # set命令定义一个变量
-# CMAKE_C_FLAGS：c的参数，会传递给编译器
-# 如果是c++文件，需要用CMAKE_CXX_FLAGS
-#-L：库的查找路径
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L[SO所在目录]")
-      ```
-##### 添加头文件目录
-      ·为了确保CMake可以在编译时定位头文件，使用include_directories, 
-      相当于g++选项中的-1参数。这样就可以使用`#include<xx.h>`，否则需要使用`#include "path/xx.h"`
-      ```cmake
-        cmake_minimum_required(VERSION 3.4.1)
-#设置头文件目录
-include_directories(<文件目录>)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L[SO所在目录]")
-aux_source_directory(.DIR_SRCS)
-add_library(
-        native-lib
-        SHARED
-        ${DIR_SRCS})
-target_link_libraries(native-lib imported-lib)
+         # set命令定义一个变量
+         # CMAKE_C_FLAGS：c的参数，会传递给编译器
+         # 如果是c++文件，需要用CMAKE_CXX_FLAGS
+         #-L：库的查找路径
+         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L[SO所在目录]")
+           
       ```
            
+##### 添加头文件目录
+         为了确保CMake可以在编译时定位头文件，使用include_directories, 
+      相当于g++选项中的-1参数。这样就可以使用`#include<xx.h>`，否则需要使用`#include "path/xx.h"`
+      
+      ```cmake
+        cmake_minimum_required(VERSION 3.4.1)
+        #设置头文件目录
+        include_directories(<文件目录>)
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -L[SO所在目录]")
+        aux_source_directory(.DIR_SRCS)
+        add_library(
+            native-lib
+            SHARED
+           ${DIR_SRCS})
+       target_link_libraries(native-lib imported-lib)
+           
+     ```
+           
 ### build.gradle配置
- ```groovy
+           
+```groovy
 android {
     // ...
     defaultConfig {
@@ -427,4 +441,5 @@ android {
         }
     }
 }
+           
 ```
