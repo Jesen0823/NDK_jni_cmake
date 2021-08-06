@@ -2,27 +2,31 @@
 
 ** a demo witrojecth cmake build a NDK project **
 ### 概念辨义：
-1.** gcc **
+1.**gcc**
    > 它是GNU Compiler Collection（就是GNU编译器套件），也可以简单认为是编译器，它可以编译很多种编程语言（括C、C++、Objective-C、Fortran、Java等等）。
 只有一个源文件时，直接就可以用gcc命令编译它。
 如果程序包含很多个源文件时，用gcc命令逐个去编译时工作量会很大，所以出现了下面make工具。
 
-2.** make **
+2.**make**
    > make工具可以看成是一个智能的批处理工具，它本身并没有编译和链接的功能，而是用类似于批处理的方式—通过调用makefile文件中用户指定的命令来进行编译和链接的。
 
-3.** makefile **
+3.**makefile**
 > makefile处理一些规则，告诉make工具怎么做，make工具就根据makefile中的命令进行编译和链接的。
 makefile命令中就包含了调用gcc（也可以是别的编译器）去编译某个源文件的命令。
 makefile需要手工编写，当工程非常大的时候，手写makefile非常麻烦，如果换了个平台makefile又要重新修改，于是就需要更强大的Cmake工具简化编译流程。
 
-4.** cmake **
+4.**cmake**
   > cmake就可以更加简单的生成makefile文件给make使用。当然cmake更强大之处在于，可以跨平台生成对应平台能用的makefile，我们就不用再自己去修改了。
 可是cmake根据什么生成makefile呢？它又要根据一个叫CMakeLists.txt文件去生成makefile。
 所以使用cmake我们只需要编写CMakeLists.txt就可以了。
 
-6.** nmake **
+6.**nmake**
 > nmake是Microsoft Visual Studio中的附带命令，需要安装VS，实际上可以说相当于linux的make
 
+      在Android Studio 2.2及以上,构建原生库的默认工具是CMake
+CMake是一个跨平台的构建工具,可以用简单的语句来描述所有平台的安装(编译过程)。能够输出各种各样的makefile或者project文件。CMake并不直接构建出最终的软件,而是产生其他工具的脚本(如makefile),然后再依据这个工具的构建方式使用。
+CMake是一个比make更高级的编译配置工具,它可以根据不同的平台、不同的编译器,生成相应的makefile或者vcproj项目,从而达到跨平台的目的。Android Studio利用CMake生成的是ninja, ninja是一个小型的关注速度的构建系统。我们不需要关心ninja的脚本,知道怎么配置CMake就可以了。
+CMake其实是一个跨平台的支持产出各种不同的构建脚本的一个工具。
 ### Cmake语法：
 
 ##### 1.单行注释 ：# xxx
@@ -240,11 +244,115 @@ sub_dir 包含CmakeLists.txt和源码文件的子目录路径
 binary_dir 输出路径，可选参数，一般不用指定
 
 ##### 常用命令 -file
-[常用命令-file.png]
+文件操作命令：
+   ```cmake
+   #将message写入filename文件中,会覆盖文件原有内容
+file(WRITE filename "message")
 
+#将message写入filename文件中,会追加在文件末尾
+file(APPEND filename "message")
 
-....
+#从filename文件中读取内容并存储到var变量中,如果指定了numBytes和offset
+#则从offset处开始最多读numBytes个字节,另外如果指定了HEX参数,则内容会以十六进制形式存储在var变量中
+file (READ filename var [LIMIT numBytes] [OFFSET offset] [HEX])
 
+#重命名文件
+file(RENAME <oldname> <newname>)
+
+#删除文件, 等于rm命令
+file (REMOVE [file1...])
+
+#递归的执行删除文件命令,等于rm-r
+file (REMOVE RECURSE [file1…])
+
+#根据指定的url下载文件
+#timeout超时时间;下载的状态会保存到status中;下载日志会被保存到log; sum指定所下载文件预期的MD5值,如果指定会自动进行比对
+#如果不一致,则回一个错误: SHOW PROGRESS,进度信息会以状态信息的形式被打印出来
+file(DOWNLOAD url file[TIMEOUT timout][STATUS status][LOG log][EXPECTED_MD5 sum][SHOW_PROGRESS])
+
+#创建目录
+file(MAKE DIRECTORY [dirl dir2…])
+
+# 会把path转换为以unix的/开头的cmake风格路径,保存在result中
+file(CMAKE_PATH path result)
+
+#它会把cmake风格的路径转换为本地路径风格: windows下用"\",而unix下用"/"
+file(TO_CMAKE_PATH path result)
+
+#将会为所有匹配查询表达式的文件生成一个文件list,并将该list存储进交量variable里,如果一个表达式指定了RELATIVE,返回的结果
+#将会是相对于给定路径的相对路径,查询表达式例子: *.cxx, *.vt?
+#NOTE:按照官方文档的说法,不建议使用file的GLOB指令来收集工程的源文件
+file(GLOB variable [RELATIVE path] [globbing expressions]…)
+   ```
+#####set_directory_properties命令 
+  **set_directory_properties(PROPERTIES prop1 value1 prop2 value2)**
+ >设置路径的一种,参数propl, prop2代表属性,取值为:
+INCLUDE_DIRECTORIES 包含目录
+LINK_DIRECTORIES  连接目录
+INCLUDE_REGULAR_EXPERSSION 正则表达式
+ADDITIONAL_MAKE_CLEAN_FILES 额外清理文件
+
+#####set_property命令
+   ```cmake
+   set_property(<GLOBAL
+DIRECTORY [dir] |
+TARGET [target ...] I
+SOURCE [src1...] |
+TEST [testl ...]|
+CACHE [entry1 ...]>
+[APPEND]
+PROPERTY <name> [value ...])
+   ```
+   > 在给定的作用域内设置一个命名的属性
+第一个参数决定了属性可以影响的作用域：
+DIRECTORY：默认当前路径，也可以用[dir]指定路径
+TARGET：目标作用域，可以是0个或多个已有目标
+SOURCE：源文件作用域，可以是0个或多个源文件
+TEST：测试作用域，可以是0个或多个已有的测试
+CACHE：必须指定0个或多个cache中已有的条目
+   
+#####多个源文件处理
+   如果源文件很多，把所有文件一个个加入很麻烦，可以使用
+aux_source_directory命令或file命令，会查找指定目录下的所有源文
+件，然后将结果存进指定变量名。
+```cmake
+cmake_minimum_required(VERSION 3.4.1)
+# 查找当前目录所有源文件 并将名称保存到 DIR_SRCS
+变量
+#不能查找子目录
+aux_source_directory(. DIR_SRCS)
+#也可以使用
+# file(GLOB DIR_SRCS *.c  *.cpp)
+
+add_library(
+native-lib
+SHARED
+${DIR_SRCS})
+```
+#####多目录多源文件处理
+* 主目录中的CMakeLists.txt中添加add_subdirectory(child）命令，指明本项目包含一个子项目child。并在target_link_libraries
+指明本项目需要链接一个名为child的库.
+* 子目录child中创建CMakeLists.txt， 这里child编译为共享库。
+```cmake
+   cmake_minimum_required(VERSION 3.4.1)
+aux_source_directory(. DIR_SRCS)
+#添加 child 子目录下的cmakelist
+add_subdirectory(child)
+
+add_library(
+native-lib
+SHARED
+${DIR_SRCS})
+target_link_libraries(native-lib child)
+############################
+#child目录下的CMakeLists.txt：
+cmake_minimum_required(VERSION 3.4.1)
+aux_source_directory(. DIR_LIB_SRCS)add_library(
+child
+SHARED
+${DIR_LIB_SRCS})
+```
+ 
 ### build.gradle配置
  ```groovy
 android {
