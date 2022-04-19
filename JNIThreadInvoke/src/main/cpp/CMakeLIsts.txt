@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.10.2)
+
+project("JNIThreadInvoke")
+
+add_library( # Sets the name of the library.
+        invoke-lib
+
+        # Sets the library as a shared library.
+        SHARED
+
+        # Provides a relative path to your source file(s).
+        jni/jni_invoke_method.cpp
+        jni/jvm.cpp
+        jni/jni_constructor.cpp)
+
+include_directories(${CMAKE_SOURCE_DIR}/jni/base.h)
+include_directories(${CMAKE_SOURCE_DIR}/jni/jvm.h)
+
+find_library( # Sets the name of the path variable.
+        log-lib
+        log )
+
+target_link_libraries( # Specifies the target library.
+        invoke-lib
+        ${log-lib} )
