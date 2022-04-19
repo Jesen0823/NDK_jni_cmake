@@ -9,3 +9,8 @@ dependencyResolutionManagement {
 rootProject.name = "NDK_jni_cmake"
 include ':app'
 include ':JNIDynamicLoad'
+include ':JniString'
+include ':JniReference'
+include ':JNIThreadInvoke'
+include ':JNIReferenceManage'
+include ':JNIException'

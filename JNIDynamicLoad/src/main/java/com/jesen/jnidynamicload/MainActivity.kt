@@ -15,5 +15,10 @@ class MainActivity : AppCompatActivity() {
         text.setOnClickListener {
             (it as TextView).text = jniDynamicLoad.getNativeString()
         }
+
+        val addText = findViewById<TextView>(R.id.addText)
+        addText.setOnClickListener {
+            addText.text = "2+3=${jniDynamicLoad.sum(2,3)}"
+        }
     }
 }
